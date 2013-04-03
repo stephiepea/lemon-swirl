@@ -12,4 +12,4 @@
 # adapter       : 'mysql'
 # location      : 'localhost/dbname'
 development:
-  base_url: #INSERT BASE URL HERE
+  base_url: #INSERT URL API ADDRESS HERE e.g www.lemon-swirl.com:4567
