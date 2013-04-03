@@ -1,0 +1,148 @@
+<!-- Define variables used to style the page before page content is loaded -->
+<% $filterclients = 0 %>
+<% $filterevents = 0 %>
+<% $value = params[:search] %>
+<% if ($value.nil? || $value == '') %>
+    <% $value = '' %>
+<% end %>
+<% client.each do |clients| %>
+    <% $filter = clients["name"] %>
+    <% if $filter.include?($value)%>
+        <% $filterclients = $filterclients +1 %>
+        <% $alertcolour = "green" %>
+        <% events.each do |event| %>
+            <% if event["client"] == clients["name"] %>
+                <% $filterevents = $filterevents +1 %>
+            <% end %>
+            <% if $filterevents > 0 %>
+                <% $alertcolour = "red" %>
+            <% end %>
+        <% end %>
+    <% end %>
+<% end %>
+<!-- Begin html body content -->
+<div id="<%= $alertcolour %>alert">
+    <div id="sensuclients"></div>
+    <nav>
+      <ul>
+        <li><a href="/">INDEX</a></li>
+        <li><a href="clients.erb?subs=Hide+Subscriptions&ip=Hide+IP+Address" id="active">CLIENTS</a></li>
+      </ul>
+    </nav>
+    <div id="wrapper">
+      <!-- Implement form search with options using only html/ruby code -->
+      <% if params[:search] == nil || params[:search] == ''%>
+          <div id="search" >
+            <form action="/clients.erb" method="get">
+              <input type="hidden" value="View Subscriptions" name="subs" />
+              <input type="hidden" value="View IP Address" name="ip" />
+              <input type="text" placeholder=" Search clients" name="search">
+              <input class="<%= $alertcolour %>formbutton" type="submit">
+            </form>
+          </div>
+          <div class="options" >
+            <% if params[:ip] == "View IP Address" %>
+                <% if params[:subs] == "View Subscriptions" %>
+                    <form id="address" action="/clients.erb" method="get">
+                      <input type="hidden" value="View Subscriptions" name="subs" />
+                      <input class="<%= $alertcolour %>formbutton" name="ip" value="Hide IP Address" type="submit">
+                    </form>
+                <% else %>
+                    <form id="address" action="/clients.erb" method="get">
+                      <input type="hidden" value="Hide Subscriptions" name="subs" />
+                      <input class="<%= $alertcolour %>formbutton" name="ip" value="Hide IP Address" type="submit">
+                    </form>
+                <% end %>
+            <% else %>
+                <% if params[:subs] == "View Subscriptions" %>
+                    <form id="address" action="/clients.erb" method="get">
+                      <input type="hidden" value="View Subscriptions" name="subs" />
+                      <input class="<%= $alertcolour %>formbutton" name="ip" value="View IP Address" type="submit">
+                    </form>
+                <% else %>
+                    <form id="address" action="/clients.erb" method="get">
+                      <input type="hidden" value="Hide Subscriptions" name="subs" />
+                      <input class="<%= $alertcolour %>formbutton" name="ip" value="View IP Address" type="submit">
+                    </form>
+                <% end %>
+            <% end %>
+          </div>
+          <div class="options" >
+            <% if params[:subs] == "View Subscriptions" %>
+                <% if params[:ip] == "View IP Address" %>
+                    <form id="subscriptions" action="/clients.erb" method="get">
+                      <input type="hidden" value="View IP Address" name="ip" />
+                      <input class="<%= $alertcolour %>formbutton" name="subs" value="Hide Subscriptions" type="submit">
+                    </form>
+                <% else %>
+                    <form id="subscriptions" action="/clients.erb" method="get">
+                      <input type="hidden" value="Hide IP Address" name="ip" />
+                      <input class="<%= $alertcolour %>formbutton" name="subs" value="Hide Subscriptions" type="submit">
+                    </form>
+                <% end %>
+            <% else %>
+                <% if params[:ip] == "View IP Address" %>
+                    <form id="subscriptions" action="/clients.erb" method="get">
+                      <input type="hidden" value="View IP Address" name="ip" />
+                      <input class="<%= $alertcolour %>formbutton" name="subs" value="View Subscriptions" type="submit">
+                    </form>
+                <% else %>
+                    <form id="subscriptions" action="/clients.erb" method="get">
+                      <input type="hidden" value="Hide IP Address" name="ip" />
+                      <input class="<%= $alertcolour %>formbutton" name="subs" value="View Subscriptions" type="submit">
+                    </form>
+                <% end %>
+            <% end %>
+          </div>
+      <% else %>
+          <div id="search" >
+            <form action="/clients.erb" method="get">
+              <input type="hidden" value="View Subscriptions" name="subs" />
+              <input type="hidden" value="View IP Address" name="ip" />
+              <input type="text" placeholder=" Search clients" name="search">
+              <input class="<%= $alertcolour %>formbutton" type="submit">
+            </form>
+          </div>
+      <% end %>
+      <% $value = params[:search] %>
+      <% if ($value.nil? || $value == '') %>
+          <% $value = '' %>
+          <h1>Current Clients (<%= client.size %>)</h1>
+      <% else %>
+          <h1>Current Clients (<%= $filterclients %>/<%= client.size %>)</h1>
+          <h4> You are currently searching for Clients which include the term: <%= params[:search] %></h4>
+      <% end %>
+      <ul>
+        <% client.each do |clients| %>
+            <% $filter = clients["name"] %>
+            <% $status = 0 %>
+            <% if $filter.include?($value)%>
+
+            <% events.each do |event| %>
+                <% if event["client"] == clients["name"] %>
+                        <% $status = event["status"] %>
+                <% end %>
+            <% end %>
+            <% if $status >= 3 %>
+                <% $status = 3 %>
+            <% end %>
+            <li>
+              <div class="clientstatus<%=$status%>">
+                <div class="clients">
+                  <%= clients["name"] %><br/>
+                <% if params[:ip] == "View IP Address" %>
+                  <%= clients["address"] %><br/>
+                <% end %>
+                </div>
+                <% if params[:subs] == "View Subscriptions" %>
+                    <div class="clientdetails">
+                        <%= clients["subscriptions"] %>
+                    </div>
+                <% end %>
+              </div>
+            </li>
+            <% end %>
+        <% end %>
+      </ul>
+    </div>
+</div>

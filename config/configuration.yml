@@ -1,0 +1,15 @@
+# PostgreSQL
+# adapter       : 'postgres'
+# location      : 'localhost/dbname'
+# auto_migrate  : 'true'
+# auto_upgrade  : 'true'
+
+# MongoDB
+# adapter       : 'mongo'
+# location      : 'localhost/dbname'
+
+# MySQL
+# adapter       : 'mysql'
+# location      : 'localhost/dbname'
+development:
+  base_url: #INSERT BASE URL HERE

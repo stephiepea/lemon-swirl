@@ -1,0 +1,63 @@
+<!-- Define variables used to style the page before page content is loaded -->
+    <% $filterevents = 0 %>
+    <% $value = params[:search] %>
+    <% if ($value.nil? || $value == '') %>
+        <% $value = '' %>
+    <% end %>
+    <% events.each do |event| %>
+        <% $filter = event["client"] %>
+        <% if $filter.include?($value)%>
+            <% $filterevents = $filterevents + 1 %>
+        <% end %>
+        <% if $filterevents > 0 %>
+            <% $alertcolour = "red" %>
+        <% else %>
+            <% $alertcolour = "green" %>
+        <% end %>
+    <% end %>
+<!-- Begin html body content -->
+<div id="<%= $alertcolour %>alert">
+    <div id="sensuevents"></div>
+    <nav>
+      <ul>
+        <li><a href="/" id="active">INDEX</a></li>
+        <li><a href="clients.erb?subs=Hide+Subscriptions&ip=Hide+IP+Address">CLIENTS</a></li>
+      </ul>
+    </nav>
+    <div id="wrapper">
+        <div id="search" >
+            <form action="/" method="get" autocomplete="off">
+              <input type="text" placeholder=" Search clients" name="search">
+              <input class="<%= $alertcolour %>formbutton" type="submit">
+            </form>
+        </div>
+          <% if ($value.nil? || $value == '') %>
+            <h1>Current Events (<%= events.size %>)</h1>
+          <% else %>
+            <h1>Current Events (<%= $filterevents %>/<%= events.size %>)</h1>
+            <h4> You are currently searching for Client names which include the term: <%= params[:search] %></h4>
+          <% end %>
+        <ul>
+          <% events.each do |event| %>
+              <% $filter = event["client"] %>
+              <% $status = event["status"] %>
+              <% if $filter.include?($value)%>
+                  <% if $status >= 3 %>
+                      <% $status = 3 %>
+                  <% end %>
+                <li>
+                    <div class="status<%=$status%>">
+                      <div class="events">
+                          <%= event["client"] %><br/>
+                      </div>
+                      <div class="eventdetails">
+                          <%= event["check"] %><br/><br/>
+                          <%= event["output"] %>
+                      </div>
+                    </div>
+                </li>
+              <% end %>
+          <% end %>
+        </ul>
+    </div>
+</div>

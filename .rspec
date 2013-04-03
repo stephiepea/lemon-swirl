@@ -1,0 +1,6 @@
+--require	spec_helper
+--profile
+--tty
+--color
+--backtrace
+--format NyanCatMusicFormatter
